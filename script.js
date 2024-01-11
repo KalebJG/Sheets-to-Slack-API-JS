@@ -1,6 +1,6 @@
 function runScriptManually() {
-  const sheetId = "Sheet ID Here"; // Replace with your sheet ID
-  const webhookUrl = 'Slack Webhook API Here' // Replace with your Slack webhook URL
+  const sheetId = "Replace with Sheet ID"; // Replace with your sheet ID
+  const webhookUrl = "Replace with slack webhook"; // Replace with your webhook URL
 
   const spreadsheet = SpreadsheetApp.openById(sheetId);
 
@@ -11,18 +11,20 @@ function runScriptManually() {
 
   const sheet = spreadsheet.getSheets()[0]; // Assuming you want the first sheet
 
-  // Simulate form submission data
-  const sampleValues = ["Value 1", "Value 2", "Value 3"]; // Replace with your sample data
+  // Get the last row of the sheet
+  const lastRow = sheet.getLastRow();
 
-  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  // Get values from the last row of columns 1, 2, and 3
+  const department = sheet.getRange(lastRow, 1).getValue();
+  const departmentId = sheet.getRange(lastRow, 2).getValue();
+  const owner = sheet.getRange(lastRow, 3).getValue();
 
-  let message = "*New Google Sheet Row*\n";
-  for (let i = 0; i < headers.length; i++) {
-    message += `*${headers[i]}*: ${sampleValues[i]}\n`;
-  }
+  // Enriched Slack message with additional text
+  const slackMessage = `You have a new assignment. Please create the following group\nDepartment: ${department}, Department_ID: ${departmentId}, Owner: ${owner}`;
 
   try {
-    postToSlack(message, webhookUrl);
+    // Post the enriched Slack message
+    postToSlack(slackMessage, webhookUrl);
   } catch (error) {
     console.error("Error posting to Slack:", error.toString());
   }
